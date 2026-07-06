@@ -418,21 +418,30 @@ def _render_dashboard(df: pd.DataFrame):
     if not debt_df.empty:
         debt_total = debt_df["Amount"].sum()
         pct        = (debt_total / total_out * 100) if total_out > 0 else 0
+        tx_label   = "transaction" if len(debt_df) == 1 else "transactions"
+
+        debt_rows_html = ""
+        for _, r in debt_df.head(4).iterrows():
+            vendor = r["Vendor"]
+            amt    = r["Amount"]
+            debt_rows_html += (
+                f'<div style="color:#9CA3AF;font-size:0.83rem;margin-bottom:3px;">'
+                f'{vendor} — <span style="color:#F87171;">−${amt:,.2f}</span></div>'
+            )
+
         st.markdown(f"""
 <div style="background:#161B22;border:1px solid #1D4ED8;border-radius:10px;
             padding:16px 20px;margin-bottom:16px;display:flex;
             justify-content:space-between;align-items:center;">
   <div>
     <div style="color:#60A5FA;font-size:0.72rem;text-transform:uppercase;
-                letter-spacing:1.5px;margin-bottom:5px;">🏦 Debt Servicing & Finance</div>
+                letter-spacing:1.5px;margin-bottom:5px;">🏦 Debt Servicing &amp; Finance</div>
     <div style="color:#F9FAFB;font-size:1.5rem;font-weight:800;">${debt_total:,.2f}</div>
     <div style="color:#8B949E;font-size:0.8rem;margin-top:3px;">
-      {len(debt_df)} transaction{'s' if len(debt_df) != 1 else ''} &nbsp;·&nbsp; {pct:.1f}% of total expenses
+      {len(debt_df)} {tx_label} &nbsp;&middot;&nbsp; {pct:.1f}% of total expenses
     </div>
   </div>
-  <div style="text-align:right;">
-    {''.join(f'<div style="color:#9CA3AF;font-size:0.83rem;margin-bottom:3px;">{r["Vendor"]} — <span style=\'color:#F87171;\'>−${r[\'Amount\']:,.2f}</span></div>' for _, r in debt_df.head(4).iterrows())}
-  </div>
+  <div style="text-align:right;">{debt_rows_html}</div>
 </div>
 """, unsafe_allow_html=True)
 
