@@ -4,6 +4,7 @@
 
 <div align="center">
 
+[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20Demo-Hugging%20Face%20Spaces-blue)](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-green.svg)
 ![spaCy](https://img.shields.io/badge/spaCy-3.7+-blue.svg)
@@ -11,7 +12,9 @@
 ![Gradio](https://img.shields.io/badge/Gradio-4.36+-yellow.svg)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
 
-**Turns messy, unstructured bank feed strings into clean, categorised accounting entries — entirely locally, with zero external API calls.**
+**🚀 [Try the live demo](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)** — no install required, works in your browser.
+
+Turns messy, unstructured bank feed strings into clean, categorised accounting entries — entirely locally, with zero external API calls.
 
 </div>
 
