@@ -7,8 +7,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from io import BytesIO
 
-from backend.parser import parse_transaction
-from backend.categoriser import categoriser
+try:
+    from backend.parser import parse_transaction
+    from backend.categoriser import categoriser
+    _BACKEND_OK = True
+    _BACKEND_ERR = ""
+except Exception as _e:
+    _BACKEND_OK = False
+    _BACKEND_ERR = str(_e)
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -112,6 +118,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
+if not _BACKEND_OK:
+    st.error(f"Backend failed to load: {_BACKEND_ERR}")
+    st.stop()
+
 tab1, tab2 = st.tabs(["⚡  Single Transaction", "📊  Upload Bank Statement"])
 
 
