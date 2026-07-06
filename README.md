@@ -11,7 +11,7 @@ pinned: false
 ---
 
 <div align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=28&duration=2800&pause=2000&color=10B981&center=true&vCenter=true&width=940&lines=Automated+Transaction+Ledger+Engine+%F0%9F%8F%A6;Raw+Bank+Feed+%E2%86%92+Structured+Ledger+Entry;No+External+APIs+%C2%B7+Sub-Millisecond+Latency" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=28&duration=2800&pause=2000&color=10B981&center=true&vCenter=true&width=940&lines=Automated+Transaction+Ledger+Engine+%F0%9F%8F%A6;Upload+a+Bank+Statement+%E2%86%92+Financial+Dashboard;Raw+Bank+Feed+%E2%86%92+Structured+Ledger+Entry;No+External+APIs+%C2%B7+Sub-Millisecond+Latency" alt="Typing SVG" />
 </div>
 
 <div align="center">
@@ -23,7 +23,8 @@ pinned: false
 ![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-green.svg)
 ![spaCy](https://img.shields.io/badge/spaCy-NLP-blue.svg)
 ![scikit--learn](https://img.shields.io/badge/scikit--learn-TF--IDF-orange.svg)
-![Gradio](https://img.shields.io/badge/Gradio-Live%20Demo-yellow.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red.svg)
+![Plotly](https://img.shields.io/badge/Plotly-Charts-3F4F75.svg)
 
 </div>
 
@@ -44,6 +45,26 @@ Accounting SaaS products like MYOB, Xero, and QuickBooks all face the same hard 
 ```
 
 This engine normalises any raw bank string into a structured, categorised ledger entry — in under 5ms, with no external API calls and no financial data leaving the system.
+
+---
+
+## 🖥️ What the Live Demo Does
+
+Two modes, one pipeline:
+
+**⚡ Single Transaction** — paste any raw bank feed string, get back vendor, amount, date, category, and a confidence score with a visual progress bar.
+
+**📊 Upload Bank Statement** — drag and drop a real CSV bank export (or use the built-in sample). The engine processes every row and renders a full financial dashboard:
+
+| Dashboard Component | What it shows |
+|---|---|
+| **KPI row** | Total Income · Total Expenses · Net Cash Flow · Transaction count |
+| **Spending donut chart** | Breakdown by ML-assigned category — interactive, hover for amounts |
+| **Top vendors bar chart** | Ranked by total spend, animated on hover |
+| **Debt & Finance tracker** | Automatically isolates loan repayments, BNPL, bank fees — shows % of total outflows |
+| **Searchable ledger table** | Full transaction list, filterable by category or free-text search |
+
+A **"Download Sample CSV"** button is built in — recruiters and reviewers can test the full dashboard in one click with no setup.
 
 ---
 
@@ -159,14 +180,15 @@ curl -X POST http://localhost:8000/process/batch \
 
 ```
 transaction-ledger-engine/
-├── app.py               # Gradio live demo (HF Spaces entry point)
+├── app.py                    # Streamlit dashboard (HF Spaces entry point)
+├── .streamlit/config.toml    # Dark theme config
 ├── backend/
-│   ├── parser.py        # Regex + spaCy parsing pipeline
-│   ├── categoriser.py   # TF-IDF cosine similarity categoriser
-│   ├── models.py        # Pydantic request/response models
-│   └── main.py          # FastAPI app + all endpoints
+│   ├── parser.py             # Regex + spaCy parsing pipeline
+│   ├── categoriser.py        # TF-IDF cosine similarity categoriser
+│   ├── models.py             # Pydantic request/response models
+│   └── main.py               # FastAPI app + all endpoints
 ├── frontend/
-│   └── app.py           # Local Gradio runner
+│   └── app.py                # Original single-transaction Gradio runner
 └── requirements.txt
 ```
 
@@ -180,7 +202,9 @@ transaction-ledger-engine/
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![spaCy](https://img.shields.io/badge/spaCy-09A3D5?style=for-the-badge&logo=spacy&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
-![Gradio](https://img.shields.io/badge/Gradio-FF6F00?style=for-the-badge&logo=gradio&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-3F4F75?style=for-the-badge&logo=plotly&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 
 </div>
 
@@ -190,11 +214,13 @@ transaction-ledger-engine/
 
 | Area | Detail |
 |---|---|
-| **NLP Pipeline Design** | Domain-aware parsing — why and when standard NER fails |
-| **API Development** | REST API with FastAPI, Pydantic models, batch endpoint |
+| **NLP Pipeline Design** | Domain-aware parsing — why and when standard NER fails on bank data |
+| **API Development** | REST API with FastAPI, Pydantic v2 models, batch endpoint (500/req) |
 | **ML without training data** | TF-IDF + cosine similarity as a zero-shot classifier |
-| **Production thinking** | Latency, privacy, cost, and explainability trade-offs |
-| **Deployment** | Live on Hugging Face Spaces, public and accessible |
+| **Data Engineering** | Auto-detect CSV column formats, pandas ingestion, PDF text extraction |
+| **Data Visualisation** | Interactive Plotly charts, KPI metrics, filterable data tables |
+| **Production thinking** | Latency, privacy, cost, and explainability trade-offs vs LLM APIs |
+| **Deployment** | Live Streamlit dashboard on Hugging Face Spaces — one-click sample |
 
 ---
 
