@@ -1,3 +1,15 @@
+---
+title: Transaction Ledger Engine
+emoji: 🏦
+colorFrom: green
+colorTo: blue
+sdk: gradio
+sdk_version: 5.33.0
+python_version: '3.11'
+app_file: app.py
+pinned: false
+---
+
 <div align="center">
   <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=28&duration=2800&pause=2000&color=10B981&center=true&vCenter=true&width=940&lines=Automated+Transaction+Ledger+Engine+%F0%9F%8F%A6;Raw+Bank+Feed+%E2%86%92+Structured+Ledger+Entry;No+External+APIs+%C2%B7+Sub-Millisecond+Latency" alt="Typing SVG" />
 </div>
