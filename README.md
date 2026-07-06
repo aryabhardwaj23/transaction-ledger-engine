@@ -16,7 +16,15 @@ pinned: false
 
 <div align="center">
 
-[![🤗 Live Demo — Try it now](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20Demo-Try%20it%20Now-brightgreen?style=for-the-badge)](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)
+## 👇 Try it live — no install required
+
+### **[🚀 Open Live Demo on Hugging Face Spaces](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)**
+
+*Upload a bank statement CSV or paste a single transaction — results in seconds*
+
+---
+
+[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Live%20Demo-brightgreen?style=for-the-badge)](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)
 [![GitHub](https://img.shields.io/badge/GitHub-View%20Code-181717?style=for-the-badge&logo=github)](https://github.com/aryabhardwaj23/transaction-ledger-engine)
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
@@ -147,8 +155,8 @@ cd transaction-ledger-engine
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn backend.main:app --reload
+# Interactive API docs → open http://localhost:8000/docs in your browser
 ```
-Interactive docs at **http://localhost:8000/docs**
 
 **Single transaction:**
 ```bash
