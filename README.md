@@ -3,8 +3,8 @@ title: Transaction Ledger Engine
 emoji: 🏦
 colorFrom: green
 colorTo: blue
-sdk: gradio
-sdk_version: 5.33.0
+sdk: streamlit
+sdk_version: 1.44.1
 python_version: '3.11'
 app_file: app.py
 pinned: false
@@ -16,122 +16,120 @@ pinned: false
 
 <div align="center">
 
-[![Live Demo](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20Demo-Hugging%20Face%20Spaces-blue)](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111+-green.svg)
-![spaCy](https://img.shields.io/badge/spaCy-3.7+-blue.svg)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4+-orange.svg)
-![Gradio](https://img.shields.io/badge/Gradio-4.36+-yellow.svg)
-![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
+[![🤗 Live Demo — Try it now](https://img.shields.io/badge/%F0%9F%A4%97%20Live%20Demo-Try%20it%20Now-brightgreen?style=for-the-badge)](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)
+[![GitHub](https://img.shields.io/badge/GitHub-View%20Code-181717?style=for-the-badge&logo=github)](https://github.com/aryabhardwaj23/transaction-ledger-engine)
 
-**🚀 [Try the live demo](https://huggingface.co/spaces/arya2323/transaction-ledger-engine)** — no install required, works in your browser.
-
-Turns messy, unstructured bank feed strings into clean, categorised accounting entries — entirely locally, with zero external API calls.
+![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-REST%20API-green.svg)
+![spaCy](https://img.shields.io/badge/spaCy-NLP-blue.svg)
+![scikit--learn](https://img.shields.io/badge/scikit--learn-TF--IDF-orange.svg)
+![Gradio](https://img.shields.io/badge/Gradio-Live%20Demo-yellow.svg)
 
 </div>
 
 ---
 
-## 🏦 The Problem
+## 🎯 What This Solves
 
-One of the toughest challenges in fintech/SaaS accounting is **transaction normalisation**. Raw bank feeds look like this:
+Accounting SaaS products like MYOB, Xero, and QuickBooks all face the same hard problem: **raw bank feeds are unstructured noise**.
 
 ```
-25/03 UBER *TRIP SYDNEY AUD 42.50
-AMZN MKTP AU*2K4XR9 84.00
-PAYPAL *SPOTIFY AU 10.99
-SQ *MARIO KART CAFE MELB 26.50
+❌  Before:  "25/03 UBER *TRIP SYDNEY AUD 42.50"
+✅  After:   Vendor: UBER  |  Amount: $42.50  |  Date: 25/03  |  Category: Travel & Transport
 ```
 
-Out-of-the-box LLMs and general-purpose NER models (spaCy, BERT) **fail on this data** — they were trained on grammatical text with proper casing and punctuation. Bank strings have none of that: all-caps, asterisks, truncated abbreviations, no sentence structure.
+```
+❌  Before:  "AMZN MKTP AU*2K4XR9 84.00"
+✅  After:   Vendor: AMZN MKTP AU  |  Amount: $84.00  |  Category: Office Supplies
+```
 
-This engine solves it with a pragmatic, two-stage pipeline designed for production constraints.
+This engine normalises any raw bank string into a structured, categorised ledger entry — in under 5ms, with no external API calls and no financial data leaving the system.
 
 ---
 
-## ⚙️ Architecture
+## 🏗️ System Architecture
 
 ```
-Raw Bank String
-      │
-      ▼
-┌─────────────────────────────────────────────────────────────┐
-│  STAGE 1 — PARSER  (backend/parser.py)                      │
-│                                                             │
-│  ① Regex for Amount  →  deterministic, 100% reliable       │
-│  ② Regex for Date    →  5 format patterns, ISO-first order  │
-│  ③ Regex pre-filter  →  isolate merchant token              │
-│     (split on first digit / asterisk / slash)               │
-│  ④ spaCy NER         →  enhancer on the clean token only    │
-└─────────────────────────────────────────────────────────────┘
-      │
-      ▼  { vendor, amount, date }
-      │
-┌─────────────────────────────────────────────────────────────┐
-│  STAGE 2 — CATEGORISER  (backend/categoriser.py)            │
-│                                                             │
-│  TF-IDF vectorisation of vendor string                      │
-│  Cosine similarity → nearest category centroid              │
-│  10 categories, seeded with domain-specific vocabulary      │
-│  Confidence score returned alongside category               │
-└─────────────────────────────────────────────────────────────┘
-      │
-      ▼
-{ vendor, amount, date, category, confidence }
+ RAW BANK STRING
+       │
+       ▼
+ ┌─────────────────────────────────────────────────────┐
+ │  STAGE 1: PARSER                                    │
+ │                                                     │
+ │  Regex  ──▶  Amount   (deterministic, < 1ms)        │
+ │  Regex  ──▶  Date     (5 AU/ISO format patterns)    │
+ │  Regex  ──▶  Vendor token  (split on digit / * / /) │
+ │  spaCy  ──▶  NER refinement on the clean token      │
+ └─────────────────────────────────────────────────────┘
+       │  { vendor, amount, date }
+       ▼
+ ┌─────────────────────────────────────────────────────┐
+ │  STAGE 2: CATEGORISER                               │
+ │                                                     │
+ │  TF-IDF vectorise vendor string                     │
+ │  Cosine similarity → nearest category centroid      │
+ │  10 accounting categories  ·  Confidence score      │
+ └─────────────────────────────────────────────────────┘
+       │
+       ▼
+ { vendor, amount, date, category, confidence }
 ```
-
-**Why not an LLM API?**
-Calling GPT-4 or Claude to extract "UBER" from a 40-character string introduces 200–800ms API latency, per-token cost, and — critically for financial data — **third-party data exposure**. The regex + spaCy + TF-IDF stack runs in **< 5ms** locally with zero privacy risk.
 
 ---
 
-## 📊 Sample Output
+## 🧠 Key Engineering Decisions
 
-| Raw Input | Vendor | Amount | Date | Category | Confidence |
-|---|---|---|---|---|---|
-| `25/03 UBER *TRIP SYDNEY AUD 42.50` | UBER | $42.50 | 25/03 | Travel & Transport | 12.4% |
-| `PAYPAL *SPOTIFY AU 10.99` | PAYPAL | $10.99 | — | Banking & Finance | 14.3% |
-| `01/07 OFFICEWORKS PTY LTD CLAYTON 67.40` | OFFICEWORKS CLAYTON | $67.40 | 01/07 | Office Supplies | 27.7% |
-| `GOOGLE ADS 2025-07-01 250.00` | GOOGLE | $250.00 | 2025-07-01 | Advertising & Marketing | 14.7% |
-| `28/06 NETFLIX.COM 22.99` | NETFLIX.COM | $22.99 | 28/06 | Subscriptions & Entertainment | 16.5% |
-| `Commonwealth Bank Fee 25/06/25 12.00` | Commonwealth Bank Fee | $12.00 | 25/06/25 | Banking & Finance | 30.5% |
+### Why not just call an LLM API?
+
+| | LLM API (GPT-4 / Claude) | This Engine |
+|---|---|---|
+| **Latency** | 200–800ms per call | < 5ms |
+| **Cost** | ~$0.002 per transaction | $0.00 |
+| **Data privacy** | Sends financial data to 3rd party | Nothing leaves your machine |
+| **Scale** | Rate-limited | 500 req/batch, synchronous |
+| **Explainability** | Black box | Every decision is traceable |
+
+For financial data at scale, **deterministic + local** beats **powerful + expensive** every time.
+
+### Why regex before NER?
+
+Standard NER models (spaCy `en_core_web_sm`, `dslim/bert-base-NER`) are trained on news and web text — grammatical, mixed-case, structured sentences. Bank feeds are the opposite: `AMZN MKTP AU*2K4XR9`, `SQ *MARIO KART CAFE MELB`. Running NER directly on these strings produces near-zero ORG matches.
+
+The fix: use regex to isolate the merchant substring *first*, removing digits, amounts, and special characters. NER then operates on a clean `"UBER"` or `"OFFICEWORKS"` — the domain it was trained for.
+
+### Why TF-IDF over a trained classifier?
+
+A trained classifier needs labelled data. TF-IDF cosine similarity against category seed vocabularies needs zero training data, is immediately interpretable (confidence = cosine score), and is extensible by simply adding new vendor keywords to a dictionary.
 
 ---
 
-## 🚀 Quick Start
+## 📊 Live Results
 
+| Raw Bank String | Vendor | Amount | Date | Category |
+|---|---|---|---|---|
+| `25/03 UBER *TRIP SYDNEY AUD 42.50` | UBER | $42.50 | 25/03 | ✈️ Travel & Transport |
+| `PAYPAL *SPOTIFY AU 10.99` | PAYPAL | $10.99 | — | 🏦 Banking & Finance |
+| `01/07 OFFICEWORKS PTY LTD CLAYTON 67.40` | OFFICEWORKS CLAYTON | $67.40 | 01/07 | 🖊️ Office Supplies |
+| `GOOGLE ADS 2025-07-01 250.00` | GOOGLE | $250.00 | 2025-07-01 | 📣 Advertising & Marketing |
+| `28/06 NETFLIX.COM 22.99` | NETFLIX.COM | $22.99 | 28/06 | 🎬 Subscriptions |
+| `TELSTRA BILL PAY 89.00` | TELSTRA | $89.00 | — | ⚡ Utilities & Bills |
+| `CHEMIST WAREHOUSE 0421 34.95` | CHEMIST | $34.95 | — | 💊 Healthcare |
+
+---
+
+## 🚀 REST API
+
+**Run locally:**
 ```bash
 git clone https://github.com/aryabhardwaj23/transaction-ledger-engine.git
 cd transaction-ledger-engine
-
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python -m spacy download en_core_web_sm
-```
-
-**Run the Gradio demo:**
-```bash
-python frontend/app.py
-```
-
-**Run the FastAPI backend:**
-```bash
 uvicorn backend.main:app --reload
-# API docs at http://localhost:8000/docs
 ```
+Interactive docs at **http://localhost:8000/docs**
 
----
-
-## 🛠️ API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/process` | Full pipeline: raw string → ledger entry |
-| `POST` | `/process/batch` | Process up to 500 entries in one request |
-| `POST` | `/parse` | Parser only: extract vendor, amount, date |
-| `POST` | `/categorise` | Categoriser only: assign category to parsed vendor |
-
-**Example:**
+**Single transaction:**
 ```bash
 curl -X POST http://localhost:8000/process \
   -H "Content-Type: application/json" \
@@ -148,21 +146,28 @@ curl -X POST http://localhost:8000/process \
 }
 ```
 
+**Batch (up to 500):**
+```bash
+curl -X POST http://localhost:8000/process/batch \
+  -H "Content-Type: application/json" \
+  -d '[{"raw": "UBER *TRIP 42.50"}, {"raw": "NETFLIX.COM 22.99"}]'
+```
+
 ---
 
 ## 📁 Project Structure
 
 ```
 transaction-ledger-engine/
+├── app.py               # Gradio live demo (HF Spaces entry point)
 ├── backend/
 │   ├── parser.py        # Regex + spaCy parsing pipeline
 │   ├── categoriser.py   # TF-IDF cosine similarity categoriser
 │   ├── models.py        # Pydantic request/response models
-│   └── main.py          # FastAPI app + endpoints
+│   └── main.py          # FastAPI app + all endpoints
 ├── frontend/
-│   └── app.py           # Gradio demo UI
-├── requirements.txt
-└── README.md
+│   └── app.py           # Local Gradio runner
+└── requirements.txt
 ```
 
 ---
@@ -181,22 +186,22 @@ transaction-ledger-engine/
 
 ---
 
-## 📈 Extending the Categoriser
+## ✅ Skills Demonstrated
 
-The `CATEGORY_SEEDS` dictionary in `categoriser.py` drives classification. Add new vendor keywords to improve accuracy for your domain:
-
-```python
-CATEGORY_SEEDS["Software & SaaS"].extend(["linear", "retool", "segment", "mixpanel"])
-```
-
-No retraining required — the TF-IDF centroids are rebuilt at startup.
+| Area | Detail |
+|---|---|
+| **NLP Pipeline Design** | Domain-aware parsing — why and when standard NER fails |
+| **API Development** | REST API with FastAPI, Pydantic models, batch endpoint |
+| **ML without training data** | TF-IDF + cosine similarity as a zero-shot classifier |
+| **Production thinking** | Latency, privacy, cost, and explainability trade-offs |
+| **Deployment** | Live on Hugging Face Spaces, public and accessible |
 
 ---
 
 <div align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=12,20,24&height=100&section=footer"/>
 
-  **⭐ Star this repo if it helped you understand production-grade NLP pipelines!**
+  **⭐ Star this repo if it helped you think differently about production NLP!**
 
   ![Visitor Count](https://komarev.com/ghpvc/?username=aryabhardwaj23-ledger&color=green&style=for-the-badge&label=VISITORS)
 </div>
